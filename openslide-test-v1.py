@@ -31,7 +31,7 @@ import argparse
 from timm import create_model
 
 
-def train_model(dataloader, threads, batch_size):
+def train_model(dataloader, threads):
     start = time.time()
     print(len(train_loader))
     model = create_model("resnet50")
@@ -154,7 +154,7 @@ if __name__ == "__main__":
             pin_memory=False,
         )
 
-        time_taken = train_model(train_loader, threads, batch_size, max_limit)
+        time_taken = train_model(train_loader, threads)
         total_threads.append(thread)
         thread_time_taken.append(thread)
 
