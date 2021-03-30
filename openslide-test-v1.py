@@ -38,7 +38,9 @@ def train_model(dataloader, threads):
     model.eval()
     print("Currently evaluating : {} threads".format(threads))
     print("Length of Train Loader : ", len(train_loader))
+    model.cuda()
     for batch_idx, (image_data, label) in enumerate(train_loader):
+        image_data = image_data.cuda()
         output = model(image_data)
         if batch_idx >= 100:
             break
