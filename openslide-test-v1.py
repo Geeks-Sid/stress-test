@@ -29,19 +29,21 @@ from tqdm import tqdm
 import glob
 import argparse
 from timm import create_model
+from torch.cuda.amp import autocast
 
 
 def train_model(dataloader, threads):
     start = time.time()
     print(len(train_loader))
-    model = create_model("resnet50")
+    model = create_model("resnet18")
     model.eval()
     print("Currently evaluating : {} threads".format(threads))
     print("Length of Train Loader : ", len(train_loader))
     model.cuda()
     for batch_idx, (image_data, label) in enumerate(train_loader):
         image_data = image_data.cuda()
-        output = model(image_data)
+        with autocast():
+            output = model(image_data)
         if batch_idx >= 100:
             break
 
@@ -94,7 +96,11 @@ class GenClassDataset(Dataset):
         y = int(self.df.loc[patient_id, "y_loc"])
         image_path = self.ref_df[self.ref_df["PID"] == pid]["Image_Path"].values[0]
         slide_ob = OpenSlide(image_path)
-        patch = np.array(slide_ob.read_region((x, y), 0, (1024, 1024)).convert("RGB"))
+        patch = np.array(
+            slide_ob.read_region(
+                (x, y), 0, (self.params["patch_size"], self.params["patch_size"])
+            ).convert("RGB")
+        )
         label = self.df.loc[patient_id, "label"]
         if self.valid:
             image = self.train_transforms(image=patch)
@@ -130,15 +136,30 @@ if __name__ == "__main__":
         help="Number of threads to test against",
         required=True,
     )
+    parser.add_argument(
+        "-b",
+        "--batch_size",
+        dest="batch_size",
+        help="Standard batch size to be for dataloader",
+    )
+    parser.add_argument(
+        "-p" "--patch_size",
+        dest="patch_size",
+        help="Standard patch size of the patches",
+    )
 
     args = parser.parse_args()
 
     train_csv = os.path.abspath(args.input_path)
     ref_csv = os.path.abspath(args.ref_path)
-    params = {}
-
-    sub_dummy = []
     threads = int(args.threads)
+    batch_size = int(args.batch_size)
+    patch_size = int(args.patch_size)
+
+    params = {}
+    params["patch_size"] = patch_size
+    params["batch_size"] = batch_size
+
     print("#" * 80)
     print("Num Workers : ", threads)
     tstart = time.time()
@@ -151,7 +172,7 @@ if __name__ == "__main__":
         dataset_train = GenClassDataset(train_csv, ref_csv, params, valid=False)
         train_loader = DataLoader(
             dataset_train,
-            batch_size=16,
+            batch_size=batch_size,
             shuffle=True,
             num_workers=thread,
             pin_memory=False,
@@ -163,7 +184,15 @@ if __name__ == "__main__":
 
     os.makedirs("./openslide_v1", exist_ok=True)
     np.savez_compressed(
-        "./New_Benchmarks_v3/gpu_stress_test_v1_" + str(args.threads) + "_threads",
+        "./openslide_v1/gpu_stress_test_v1_"
+        + str(threads)
+        + "_threads_"
+        + str(batch_size)
+        + "_batch_size_"
+        + str(patch_size)
+        + "_patch_size",
         thread_list=total_threads,
         time_taken=thread_time_taken,
+        batch_size=batch_size,
+        patch_size=patch_size,
     )
