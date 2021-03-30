@@ -89,7 +89,7 @@ class GenClassDataset(Dataset):
         pid = self.df.loc[patient_id, "PID"]
         x = int(self.df.loc[patient_id, "x_loc"])
         y = int(self.df.loc[patient_id, "y_loc"])
-        image_path = self.ref_df[self.ref_df["PID"] == pid]["Image_Path"]
+        image_path = self.ref_df[self.ref_df["PID"] == pid]["Image_Path"].values[0]
         slide_ob = OpenSlide(image_path)
         patch = np.array(slide_ob.read_region((x, y), 0, (1024, 1024)).convert("RGB"))
         label = self.df.loc[patient_id, "label"]
