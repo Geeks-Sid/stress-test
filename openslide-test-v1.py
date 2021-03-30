@@ -37,9 +37,10 @@ def train_model(dataloader, threads):
     model = create_model("resnet50")
     model.eval()
     print("Currently evaluating : {} threads".format(threads))
+    print("Length of Train Loader : ", len(train_loader))
     for batch_idx, (image_data, label) in enumerate(train_loader):
         output = model(image_data)
-        if batch_idx >= 300:
+        if batch_idx >= 100:
             break
 
     tend = time.time()
