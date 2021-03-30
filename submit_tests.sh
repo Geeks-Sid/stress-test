@@ -13,5 +13,5 @@ count=${#batch_sizes[@]}
 for i in `seq 1 $count`
 do
     echo ${patch_sizes[$i-1]} ${batch_sizes[$i-1]}
-    echo openslide-test-v1.py -i $base_csv -r $ref_csv -b ${batch_sizes[$i-1]} -p ${patch_sizes[$i-1]} -t $threads
+    bash openslide-test-v1.py -i $base_csv -r $ref_csv -b ${batch_sizes[$i-1]} -p ${patch_sizes[$i-1]} -t $threads
 done
