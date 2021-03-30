@@ -151,7 +151,7 @@ if __name__ == "__main__":
         dataset_train = GenClassDataset(train_csv, ref_csv, params, valid=False)
         train_loader = DataLoader(
             dataset_train,
-            batch_size=32,
+            batch_size=16,
             shuffle=True,
             num_workers=thread,
             pin_memory=False,
