@@ -178,9 +178,9 @@ if __name__ == "__main__":
             pin_memory=False,
         )
 
-        time_taken = train_model(train_loader, threads)
+        time_taken = train_model(train_loader, thread)
         total_threads.append(thread)
-        thread_time_taken.append(thread)
+        thread_time_taken.append(time_taken)
 
     os.makedirs("./openslide_v1", exist_ok=True)
     np.savez_compressed(
