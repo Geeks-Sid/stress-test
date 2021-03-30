@@ -36,7 +36,7 @@ def train_model(dataloader, threads, batch_size):
     print(len(train_loader))
     model = create_model("resnet50")
     model.eval()
-
+    print("Currently evaluating : {} threads".format(threads))
     for batch_idx, (image_data, label) in enumerate(train_loader):
         output = model(image_data)
         if batch_idx >= 300:
@@ -150,7 +150,7 @@ if __name__ == "__main__":
             dataset_train,
             batch_size=32,
             shuffle=True,
-            num_workers=args.threads,
+            num_workers=thread,
             pin_memory=False,
         )
 
