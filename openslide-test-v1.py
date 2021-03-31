@@ -50,7 +50,7 @@ def train_model(dataloader, thread):
     tend = time.time()
     print("Time taken for {} workers : {}".format(thread, tend - start))
 
-    time_taken = tend - tstart
+    time_taken = tend - start
 
     return time_taken
 
@@ -200,4 +200,3 @@ if __name__ == "__main__":
         batch_size=batch_size,
         patch_size=patch_size,
     )
-
