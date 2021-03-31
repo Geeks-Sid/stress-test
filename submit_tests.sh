@@ -1,5 +1,5 @@
-patch_sizes="64 128 256 512 1024 2048 4096";
-batch_sizes="24576 6144 1536 384 96 24 6";
+patch_sizes="4096 2048 1024 512 256";
+batch_sizes="6 24 96 384 1536";
 
 patch_sizes=($patch_sizes)
 batch_sizes=($batch_sizes)
