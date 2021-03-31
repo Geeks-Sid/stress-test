@@ -167,7 +167,7 @@ if __name__ == "__main__":
     total_threads = []
     thread_time_taken = []
 
-    for thread in range(threads, 0, -1):
+    for thread in range(threads, 4, -1):
         try:
             dataset_train = GenClassDataset(train_csv, ref_csv, params, valid=False)
             train_loader = DataLoader(
@@ -200,3 +200,4 @@ if __name__ == "__main__":
         batch_size=batch_size,
         patch_size=patch_size,
     )
+
