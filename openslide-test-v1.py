@@ -32,23 +32,23 @@ from timm import create_model
 from torch.cuda.amp import autocast
 
 
-def train_model(dataloader, threads):
+def train_model(dataloader, thread):
     start = time.time()
     print(len(train_loader))
     model = create_model("resnet18")
     model.eval()
-    print("Currently evaluating : {} threads".format(threads))
+    print("Currently evaluating : {} thread".format(thread))
     print("Length of Train Loader : ", len(train_loader))
     model.cuda()
     for batch_idx, (image_data, label) in enumerate(train_loader):
         image_data = image_data.cuda()
         with autocast():
             output = model(image_data)
-        if batch_idx >= 100:
+        if batch_idx >= 50:
             break
-
+        del image_data, output
     tend = time.time()
-    print("Time taken for {} workers : {}".format(threads, tend - start))
+    print("Time taken for {} workers : {}".format(thread, tend - start))
 
     time_taken = tend - tstart
 
@@ -167,20 +167,24 @@ if __name__ == "__main__":
     total_threads = []
     thread_time_taken = []
 
-    for thread in range(threads):
+    for thread in range(threads, 0, -1):
+        try:
+            dataset_train = GenClassDataset(train_csv, ref_csv, params, valid=False)
+            train_loader = DataLoader(
+                dataset_train,
+                batch_size=batch_size,
+                shuffle=True,
+                num_workers=thread,
+                pin_memory=False,
+            )
 
-        dataset_train = GenClassDataset(train_csv, ref_csv, params, valid=False)
-        train_loader = DataLoader(
-            dataset_train,
-            batch_size=batch_size,
-            shuffle=True,
-            num_workers=thread,
-            pin_memory=False,
-        )
-
-        time_taken = train_model(train_loader, thread)
-        total_threads.append(thread)
-        thread_time_taken.append(time_taken)
+            time_taken = train_model(train_loader, thread)
+            total_threads.append(thread)
+            thread_time_taken.append(time_taken)
+        except RuntimeError:
+            total_threads.append(thread)
+            thread_time_taken.append(0)
+        torch.cuda.empty_cache()
 
     os.makedirs("./openslide_v1", exist_ok=True)
     np.savez_compressed(
