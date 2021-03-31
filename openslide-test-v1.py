@@ -25,8 +25,6 @@ from albumentations import (
 )
 import time
 from openslide import OpenSlide
-from tqdm import tqdm
-import glob
 import argparse
 from timm import create_model
 from torch.cuda.amp import autocast
