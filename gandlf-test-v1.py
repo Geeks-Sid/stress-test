@@ -126,13 +126,13 @@ if __name__ == "__main__":
         help="input path of tissue files",
         required=True,
     )
-    parser.add_argument(
-        "-r",
-        "--ref_path",
-        dest="ref_path",
-        help="reference path of output files",
-        required=True,
-    )
+    # parser.add_argument(
+    #     "-r",
+    #     "--ref_path",
+    #     dest="ref_path",
+    #     help="reference path of output files",
+    #     required=True,
+    # )
     parser.add_argument(
         "-t",
         "--threads",
@@ -146,11 +146,11 @@ if __name__ == "__main__":
         dest="batch_size",
         help="Standard batch size to be for dataloader",
     )
-    parser.add_argument(
-        "-p" "--patch_size",
-        dest="patch_size",
-        help="Standard patch size of the patches",
-    )
+    # parser.add_argument(
+    #     "-p" "--patch_size",
+    #     dest="patch_size",
+    #     help="Standard patch size of the patches",
+    # )
 
     args = parser.parse_args()
 
@@ -161,7 +161,7 @@ if __name__ == "__main__":
     patch_size = int(args.patch_size)
 
     params = {}
-    params["patch_size"] = patch_size
+    params["patch_size"] = [128,128,128]
     params["batch_size"] = batch_size
 
     print("#" * 80)
