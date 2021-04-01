@@ -1,0 +1,3 @@
+[submodule "GANDLF"]
+	path = GANDLF
+	url = https://github.com/CBICA/GaNDLF.git
