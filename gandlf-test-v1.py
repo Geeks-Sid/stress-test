@@ -75,7 +75,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     train_csv = os.path.abspath(args.input_path)
-    ref_csv = os.path.abspath(args.ref_path)
     threads = int(args.threads)
     batch_size = int(args.batch_size)
     patch_size = int(args.patch_size)
@@ -123,9 +122,9 @@ if __name__ == "__main__":
             thread_time_taken.append(0)
         torch.cuda.empty_cache()
 
-    os.makedirs("./openslide_v1", exist_ok=True)
+    os.makedirs("./gandlf_v1", exist_ok=True)
     np.savez_compressed(
-        "./openslide_v1/gpu_stress_test_v1_"
+        "./gandlf_v1/gpu_stress_test_v1_"
         + str(threads)
         + "_threads_"
         + str(batch_size)
