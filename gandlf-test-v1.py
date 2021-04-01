@@ -12,17 +12,6 @@ import numpy as np
 import pandas as pd
 import os
 import torch
-# from albumentations import (
-#     RandomBrightnessContrast,
-#     HueSaturationValue,
-#     RandomGamma,
-#     GaussNoise,
-#     GaussianBlur,
-#     HorizontalFlip,
-#     VerticalFlip,
-#     Compose,
-#     Normalize,
-# )
 import time
 # from openslide import OpenSlide
 import argparse
@@ -30,6 +19,7 @@ import argparse
 from torch.cuda.amp import autocast
 
 from .GANDLF.GANDLF.utils import *
+from .GANDLF.GANDLF.parseConfig import *
 from .GANDLF.GANDLF.parameterParsing import *
 from .GANDLF.GANDLF.data.ImagesFromDataFrame import ImagesFromDataFrame
 
@@ -58,64 +48,6 @@ def train_model(dataloader, thread):
 
     return time_taken
 
-
-# class GenClassDataset(Dataset):
-#     def __init__(self, csv_file, ref_file, params, valid=False):
-#         self.csv_file = csv_file
-#         self.ref_file = ref_file
-#         self.df = pd.read_csv(csv_file)
-#         self.ref_df = pd.read_csv(ref_file)
-#         self.params = params
-#         self.valid = valid
-#         self.train_transforms = Compose(
-#             [
-#                 RandomBrightnessContrast(brightness_limit=0.4, contrast_limit=0.4),
-#                 HueSaturationValue(
-#                     hue_shift_limit=30, sat_shift_limit=45, val_shift_limit=30
-#                 ),
-#                 RandomGamma(gamma_limit=(80, 120)),
-#                 GaussNoise(var_limit=(10, 200)),
-#                 GaussianBlur(blur_limit=11),
-#                 VerticalFlip(p=0.5),
-#                 HorizontalFlip(p=0.5),
-#                 Normalize(
-#                     mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5), always_apply=True, p=1.0
-#                 ),
-#             ]
-#         )
-#         self.validation_transforms = Compose(
-#             [
-#                 Normalize(
-#                     mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5), always_apply=True, p=1.0
-#                 )
-#             ]
-#         )
-
-#     def __len__(self):
-#         return len(self.df)
-
-#     def __getitem__(self, patient_id):
-#         pid = self.df.loc[patient_id, "PID"]
-#         x = int(self.df.loc[patient_id, "x_loc"])
-#         y = int(self.df.loc[patient_id, "y_loc"])
-#         image_path = self.ref_df[self.ref_df["PID"] == pid]["Image_Path"].values[0]
-#         slide_ob = OpenSlide(image_path)
-#         patch = np.array(
-#             slide_ob.read_region(
-#                 (x, y), 0, (self.params["patch_size"], self.params["patch_size"])
-#             ).convert("RGB")
-#         )
-#         label = self.df.loc[patient_id, "label"]
-#         if self.valid:
-#             image = self.train_transforms(image=patch)
-#         else:
-#             image = self.validation_transforms(image=patch)
-#         patch = image["image"]
-#         patch = np.transpose(patch, (2, 0, 1))
-#         patch = torch.FloatTensor(patch)
-#         return patch, label
-
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
@@ -126,13 +58,6 @@ if __name__ == "__main__":
         help="input path of tissue files",
         required=True,
     )
-    # parser.add_argument(
-    #     "-r",
-    #     "--ref_path",
-    #     dest="ref_path",
-    #     help="reference path of output files",
-    #     required=True,
-    # )
     parser.add_argument(
         "-t",
         "--threads",
@@ -146,11 +71,6 @@ if __name__ == "__main__":
         dest="batch_size",
         help="Standard batch size to be for dataloader",
     )
-    # parser.add_argument(
-    #     "-p" "--patch_size",
-    #     dest="patch_size",
-    #     help="Standard patch size of the patches",
-    # )
 
     args = parser.parse_args()
 
@@ -160,8 +80,7 @@ if __name__ == "__main__":
     batch_size = int(args.batch_size)
     patch_size = int(args.patch_size)
 
-    params = {}
-    params["patch_size"] = [128,128,128]
+    params = parseConfig('./GANDLF/samples/config_segmentation_brats.yaml')
     params["batch_size"] = batch_size
 
     print("#" * 80)
@@ -175,7 +94,6 @@ if __name__ == "__main__":
 
     for thread in range(threads, 4, -1):
         try:
-            # dataset_train = GenClassDataset(train_csv, ref_csv, params, valid=False)
             dataset_train = ImagesFromDataFrame(data_train, 
                         params["patch_size"], 
                         headers_train, 
