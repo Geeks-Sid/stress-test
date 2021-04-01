@@ -31,6 +31,7 @@ from torch.cuda.amp import autocast
 
 from .GANDLF.GANDLF.utils import *
 from .GANDLF.GANDLF.parameterParsing import *
+from .GANDLF.GANDLF.data.ImagesFromDataFrame import ImagesFromDataFrame
 
 
 def train_model(dataloader, thread):
@@ -170,9 +171,24 @@ if __name__ == "__main__":
     total_threads = []
     thread_time_taken = []
 
+    data_train, headers_train = parseTrainingCSV(train_csv)
+
     for thread in range(threads, 4, -1):
         try:
-            dataset_train = GenClassDataset(train_csv, ref_csv, params, valid=False)
+            # dataset_train = GenClassDataset(train_csv, ref_csv, params, valid=False)
+            dataset_train = ImagesFromDataFrame(data_train, 
+                        params["patch_size"], 
+                        headers_train, 
+                        q_max_length = 100, 
+                        q_samples_per_volume = 5, 
+                        q_num_workers = thread, 
+                        q_verbose = False, 
+                        sampler = 'uniform', 
+                        train = True, 
+                        augmentations = params["data_augmentations"], 
+                        preprocessing = params["data_preprocessing"], 
+                        in_memory = False)
+
             train_loader = DataLoader(
                 dataset_train,
                 batch_size=batch_size,
