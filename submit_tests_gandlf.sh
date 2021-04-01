@@ -5,13 +5,12 @@ patch_sizes=($patch_sizes)
 batch_sizes=($batch_sizes)
 
 base_csv=$1
-ref_csv=$2
-threads=28
 
-count=${#batch_sizes[@]}
-
-for i in `seq 1 $count`
+for b in batch_sizes
 do
-    echo ${patch_sizes[$i-1]} ${batch_sizes[$i-1]}
-    python openslide-test-v1.py -i $base_csv -b ${batch_sizes[$i-1]} -t $threads
+    for t in thread_sizes
+    do
+        echo $b $t
+        python gandlf-test-v1.py -i $base_csv -b $b -t $t
+    done
 done
