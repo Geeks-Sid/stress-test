@@ -18,10 +18,10 @@ import argparse
 # from timm import create_model
 from torch.cuda.amp import autocast
 
-from GANDLF.utils import *
-from GANDLF.parseConfig import *
-from GANDLF.parameterParsing import *
-from GANDLF.data.ImagesFromDataFrame import ImagesFromDataFrame
+from .GANDLF.GANDLF.utils import *
+from .GANDLF.GANDLF.parseConfig import *
+from .GANDLF.GANDLF.parameterParsing import *
+from .GANDLF.GANDLF.data.ImagesFromDataFrame import ImagesFromDataFrame
 
 
 def train_model(dataloader, thread):
