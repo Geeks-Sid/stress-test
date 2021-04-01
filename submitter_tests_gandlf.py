@@ -7,4 +7,4 @@ for b in batch_sizes:
   for t in thread_sizes:
     command = 'python gandlf-test-v1.py -i ~/projects_wsl/stress-test/data.csv -b ' + str(b) + ' -t ' + str(t)
     # print(command)
-    subprocess.Popen(command)
+    subprocess.Popen(command, shell=True).wait()
